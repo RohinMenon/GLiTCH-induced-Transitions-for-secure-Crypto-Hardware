@@ -1,14 +1,14 @@
-# 🔐 GLiTCH: Leakage Evaluation Framework for Cryptographic Hardware
+# Pre-Silicon Leakage Analyzer
 
-This repository provides a lightweight framework to evaluate side-channel leakage in unmasked cryptographic S-Box designs. It uses simulation traces (VCDs) generated via Verilog simulation (e.g., using `iverilog`) and performs automated leakage analysis using known input data.
+This code provides a framework to evaluate side-channel leakage in a designs pre-fabrication. It uses simulation traces (VCDs) generated via Verilog simulation (e.g., using `iverilog`) and performs automated leakage analysis using known input data.
 
-GLiTCH enables a systematic way to explore how signal transitions reveal secret-dependent information, especially in the context of secure hardware design.
+This framework enables a systematic way to explore how signal transitions reveal secret-dependent information, especially in the context of secure hardware design.
 
 ---
 
 ## 🧩 Overview
 
-The toolchain consists of two main scripts:
+The code consists of two main scripts:
 
 1. **`unmasked_aes_sbox.sh`**  
    Automates Verilog simulations across multiple inputs and generates switching activity traces (VCDs) for each run.
@@ -22,15 +22,13 @@ The toolchain consists of two main scripts:
 
 ```
 .
-├── unmasked_aes_sbox.sh          # Verilog simulation driver (bash)
+├── README.md                     # This file
 ├── analyze_leaks.py              # Leakage analysis script (Python)
 ├── clean.sh                      # Utility to remove temporary files
-├── verilog_files/                # Folder with Verilog designs and testbenches
-├── sboxes/aes/                   # Folder for storing input VCDs and txtfile.txt
-├── vcd/                          # Output directory for VCD traces
-├── txtfile.txt                   # Plaintext input oracle (generated)
 ├── output_processing/            # Post-analysis result handling
-└── README.md                     # This file
+├── txtfile.txt                   # Plaintext input oracle (generated)
+├── unmasked_aes_sbox.sh          # Example Verilog simulation driver (bash)
+└── verilog_files/                # Folder with Verilog designs and testbenches
 ```
 
 ---
@@ -78,7 +76,7 @@ This script performs multiple Verilog simulations for an S-Box design. For each 
 
 ## 📊 Leakage Analysis: `analyze_leaks.py`
 
-This Python script performs post-simulation leakage analysis by correlating signal transitions in VCD files with their corresponding input values. It calculates metrics like **Guessing Entropy (GE)** and can process designs in parallel using multithreading.
+This Python script performs post-simulation leakage analysis by correlating signal transitions in VCD files with their corresponding input values. It calculates a leakage metric (correlation) for each wire and can process designs in parallel using multithreading.
 
 ### ✅ Usage
 
@@ -104,17 +102,15 @@ python3 analyze_leaks.py 100 "FN_unmasked_aes_key_100" -n 256 -r sboxes/aes -p 3
 
 ### 📤 Output
 
-- Leakage metrics such as:
-  - **Guessing Entropy (GE)**
-  - Possibly Correlation Power Analysis (CPA) scores
-- Processed output stored inside `output_processing/sboxes/aes/`
-- Intermediate and final results saved using the given prefix (`RESULTS_FOLDER`)
+- Leakage metrics -- Correlation Power Analysis (CPA) scores
+- Processed output stored inside `output_processing/sboxes/aes/` (for the given example)
+- Intermediate time-sliced results (especially in case of multi-cycle or timing based simulations) are saved in `./sboxes/aes/` (for the given example)
 
 ---
 
 ## 🧼 Cleanup
 
-To remove temporary build artifacts (dumpfiles, VCDs, intermediate files):
+To remove temporary build artifacts (dumpfiles, VCDs, intermediate files, pkl files, etc):
 
 ```bash
 ./clean.sh
@@ -134,12 +130,17 @@ done
 echo "txtfile.txt created successfully."
 ```
 
+Note that the VCDs in this case must be generated independedntly and stored in the folder `vcd/` following the same naming convention as before
+
 ---
 
 ## 🧑‍💻 Maintainers
 
 - **Rohin Menon**  
   [GitHub @RohinMenon](https://github.com/RohinMenon)
+
+- **Jayant B**  
+  [GitHub @jayanthbala08](https://github.com/jayanthbala08)
 
 ---
 
